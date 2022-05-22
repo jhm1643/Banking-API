@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.homework.banking.mapper.BalanceSearchMapper">
+
+    <select id="findAllAvgBalanceByAgeGroup" resultType="com.homework.banking.dto.response.AvgDepositByAgeGroupResponse">
+        SELECT  age/10*10 AS ageGroup,
+                ROUND(AVG(balance)) AS avgBalance
+        FROM    (
+                    SELECT  age,
+                            SUM(CASE WHEN deposit_withdraw_flag = 'Y' THEN deposit_amount ELSE -deposit_amount END) AS balance
+                    FROM    user
+                            INNER JOIN account ON user.id = account.user_id
+                            INNER JOIN account_history history ON account.account_number = history.account_number
+                    GROUP BY user.id
+                )
+        GROUP BY ageGroup;
+    </select>
+</mapper>
